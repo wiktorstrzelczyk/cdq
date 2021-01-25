@@ -54,9 +54,9 @@ public class ExponentiationCalculationTaskRegistryImpl implements Exponentiation
 
     @Override
     public Long registerNewTask(MonitorableFutureTask<BigInteger> task) {
-        Long newLong = idSequence.incrementAndGet();
-        tasks.put(newLong, task);
-        return newLong;
+        Long nextId = idSequence.incrementAndGet();
+        tasks.put(nextId, task);
+        return nextId;
     }
 
     @Override

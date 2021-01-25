@@ -14,29 +14,31 @@ import java.util.concurrent.ExecutorService;
 @RequiredArgsConstructor
 public class ExponentiationApiServiceImpl implements ExponentiationApiService {
 
-    private final ExecutorService taskExecutor;
-    private final ExponentiationCalculationTaskRegistry taskRegistry;
+    private final ExecutorService executorService;
+    private final ExponentiationCalculationTaskRegistry exponentiationTaskRegistry;
 
     @Override
     public Long registerTask(TaskCreateRequest request) {
-        ExponentiationCalculationCallable powerCalculationTask = new ExponentiationCalculationCallable(request.getBase(), request.getExponent());
-        MonitorableFutureTask<BigInteger> task = new MonitorableFutureTask(powerCalculationTask);
-        return taskRegistry.registerNewTask(task);
+        Integer base = request.getBase();
+        Integer exponent = request.getExponent();
+        ExponentiationCalculationCallable exponentiationCallable = new ExponentiationCalculationCallable(base, exponent);
+        MonitorableFutureTask<BigInteger> exponentiationTask = new MonitorableFutureTask(exponentiationCallable);
+        return exponentiationTaskRegistry.registerNewTask(exponentiationTask);
     }
 
     @Override
     public void executeTask(Long taskId) {
-        MonitorableFutureTask<BigInteger> task = taskRegistry.getTask(taskId);
-        taskExecutor.submit(task);
+        MonitorableFutureTask<BigInteger> exponentiationTask = exponentiationTaskRegistry.getTask(taskId);
+        executorService.submit(exponentiationTask);
     }
 
     @Override
     public TaskInformation get(Long taskId) {
-       return taskRegistry.getTaskInformation(taskId);
+       return exponentiationTaskRegistry.getTaskInformation(taskId);
     }
 
     @Override
     public List<TaskInformation> find() {
-       return taskRegistry.getAllTasksInformation();
+       return exponentiationTaskRegistry.getAllTasksInformation();
     }
 }
